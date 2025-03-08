@@ -3,8 +3,7 @@ import settings
 
 
 async def captcha(proxy, session, user_agent):
-    proxy_tuple_full = proxy.split('://')
-    proxy_tuple = proxy_tuple_full[1].split('@')
+    proxy_tuple = proxy.split('@')
 
     proxy_login, proxy_password = proxy_tuple[0].split(':')
     proxy_address, proxy_port = proxy_tuple[1].split(':')
