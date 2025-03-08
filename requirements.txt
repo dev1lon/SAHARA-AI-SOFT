@@ -1,0 +1,4 @@
+aiohttp-proxy==0.1.2
+fake-useragent==2.0.3
+loguru==0.7.3
+web3==6.13.0
