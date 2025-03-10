@@ -16,7 +16,7 @@ async def faucet(count, proxy, client):
 
     balance  = await client.w3.eth.get_balance(client.account.address)
     if balance < 0.01 * 10 ** 18:
-        logger.error(f'Нет 0.01 ETH в эфире | {client.account.address}')
+        logger.error(f'[{count}] Нет 0.01 ETH в эфире | {client.account.address}')
         return
 
     headers_test = {
@@ -33,6 +33,7 @@ async def faucet(count, proxy, client):
     }
 
     connector = ProxyConnector.from_url(f'http://{proxy}')
+
     idx += 1
 
     async with aiohttp.ClientSession(connector=connector) as session:
