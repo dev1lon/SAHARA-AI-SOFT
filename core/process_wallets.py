@@ -39,7 +39,7 @@ async def process_wallets(count, private_key, proxy):
             await asyncio.sleep(sleep_time)
 
         if settings.Transaction:
-            await transaction.transaction(count, client_sahq)
+            await transaction.transaction(count, client_sah)
             sleep_time = random.randint(settings.sleep_actions[0], settings.sleep_actions[1])
             logger.debug(f'[{count}] сон между действиями - {sleep_time} секунд')
             await asyncio.sleep(sleep_time)
