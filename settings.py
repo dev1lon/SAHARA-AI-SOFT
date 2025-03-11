@@ -5,6 +5,7 @@ threads = 1
 
 api_key = '' # 2captcha
 
+balance_shards = True
 Faucet = True
 Transaction = True
 Claim = True

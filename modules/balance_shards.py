@@ -1,4 +1,3 @@
-import asyncio
 import aiohttp
 import time
 
@@ -12,7 +11,7 @@ from utils.logger import get_logger
 logger = get_logger()
 
 
-async def claim(count, proxy, client):
+async def balance_shards(count, proxy, client):
     user_agent = UserAgent().random
 
     headers = {
@@ -43,25 +42,14 @@ async def claim(count, proxy, client):
         async with session.post(url='https://legends.saharalabs.ai/api/v1/login/wallet', json=json_wallet) as response:
             data = await response.json()
             access_token = data['accessToken']
-            headers_claim = {
+            headers_info = {
                 'authorization': f'Bearer {access_token}'
             }
-            json_claim = {
-                'taskID': '1004',
-                'timestamp': time.time(),
+            json_info = {
+                'timestamp': time.time()
             }
 
-        async with session.post(url='https://legends.saharalabs.ai/api/v1/task/flush',json=json_claim, headers=headers_claim):
-            await asyncio.sleep(5)
-
-        async with session.post(url='https://legends.saharalabs.ai/api/v1/task/claim', json=json_claim, headers=headers_claim) as response:
-            status = await response.json()
-            if response.status == 400:
-                if status['message'] == 'reward of task: 1004 has been claimed':
-                    logger.warning(f'[{count}] {client.account.address} | Награда уже была заклеймлина сегодня')
-                elif status['message'] == 'task not finished':
-                    logger.error(f'[{count}] {client.account.address} | Транзакция для клейма не сделана')
-            elif response.status == 200:
-                logger.success(f'[{count}] {client.account.address} | Удачный клейм')
-            else:
-                logger.error(f'[{count}] {client.account.address} | Ошибка во время клейма')
+        async with session.post(url='https://legends.saharalabs.ai/api/v1/user/info', headers=headers_info, json=json_info) as response:
+            data = await response.json()
+            balance = data['shardAmount']
+            logger.success(f'[{count}] {client.account.address} | {balance} shards')

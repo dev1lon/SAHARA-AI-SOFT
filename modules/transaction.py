@@ -7,12 +7,7 @@ from utils.logger import get_logger
 logger = get_logger()
 
 
-async def transaction(count, private_key, proxy):
-    client = Client(
-        private_key=private_key,
-        proxy=proxy,
-        rpc='https://testnet.saharalabs.ai',
-    )
+async def transaction(count, client):
 
     amount = int(random.uniform(0.0001, 0.001) * 10 ** 18)
 
