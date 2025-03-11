@@ -22,8 +22,8 @@ async def transaction(count, private_key, proxy):
             to=client.random_account.address,
             value=amount,
         )
-    except ValueError:
-        logger.warning(f'[{count}] {client.account.address} | Не хватает баланса для транзакции')
+    except Exception as error:
+        logger.warning(f'[{count}] {client.account.address} | {error}')
 
     if tx_hash:
         try:
