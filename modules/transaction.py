@@ -21,6 +21,7 @@ async def transaction(count, private_key, proxy):
         tx_hash = await client.send_transaction(
             to=client.random_account.address,
             value=amount,
+            increase_gas=5
         )
     except Exception as error:
         logger.warning(f'[{count}] {client.account.address} | {error}')
