@@ -54,7 +54,7 @@ class Client:
             'nonce': await self.w3.eth.get_transaction_count(self.account.address),
             'from': AsyncWeb3.to_checksum_address(from_),
             'to': AsyncWeb3.to_checksum_address(to),
-            'gasPrice': await self.w3.eth.gas_price
+            'gasPrice': int(await self.w3.eth.gas_price * 1.5)
         }
 
         if data:
