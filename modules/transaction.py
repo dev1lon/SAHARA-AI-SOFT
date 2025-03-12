@@ -1,6 +1,5 @@
 import random
 
-from core.client import Client
 from utils.logger import get_logger
 
 
@@ -15,7 +14,8 @@ async def transaction(count, client):
     try:
         tx_hash = await client.send_transaction(
             to=client.random_account.address,
-            value=amount
+            value=amount,
+            increase_gas=1.5
         )
     except Exception as error:
         logger.warning(f'[{count}] {client.account.address} | {error}')

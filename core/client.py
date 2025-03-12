@@ -44,6 +44,7 @@ class Client:
             data: HexStr | None = None,
             from_: str | ChecksumAddress | None = None,
             increase_gas: float = 1,
+            increase_gas_price: float = 1,
             value: int | None = None,
     ) -> HexBytes | None:
         if not from_:
@@ -54,7 +55,7 @@ class Client:
             'nonce': await self.w3.eth.get_transaction_count(self.account.address),
             'from': AsyncWeb3.to_checksum_address(from_),
             'to': AsyncWeb3.to_checksum_address(to),
-            'gasPrice': int(await self.w3.eth.gas_price * 1.5)
+            'gasPrice': int(await self.w3.eth.gas_price * increase_gas_price)
         }
 
         if data:
@@ -63,7 +64,7 @@ class Client:
             tx_params['value'] = value
 
         gas = await self.w3.eth.estimate_gas(tx_params)
-        tx_params['gas'] = gas * increase_gas
+        tx_params['gas'] = int(gas * increase_gas)
 
         sign = self.w3.eth.account.sign_transaction(tx_params, self.private_key)
         return await self.w3.eth.send_raw_transaction(sign.rawTransaction)

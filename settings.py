@@ -5,7 +5,8 @@ threads = 1
 
 api_key = '' # 2captcha
 
-balance_shards = True
-Faucet = True
-Transaction = True
-Claim = True
+balance_shards = False
+Faucet = False
+Transaction = False
+Claim = False
+mint_nerzo = True
