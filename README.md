@@ -61,4 +61,4 @@
   module_name = False  # (если нужно отключить)
   ```
 
-**TG channel:** t.me/strange_move
+**TG channel:** https://t.me/strange_move
