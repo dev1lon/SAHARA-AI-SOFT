@@ -36,23 +36,29 @@ async def faucet(count, proxy, client):
 
     idx += 1
 
-    async with aiohttp.ClientSession(connector=connector) as session:
-        async with session.post(url='https://testnet.saharalabs.ai/', headers=headers_test, json=json_test) as response:
-            if response.status == 200:
-                await captcha.captcha(proxy=proxy, session=session, user_agent=user_agent)
-                headers_claim = {
-                    'cf-turnstile-response': await captcha.captcha(proxy=proxy, session=session, user_agent=user_agent),
-                    'user-agent': user_agent,
-                }
-                json_claim = {
-                    'address': client.account.address,
-                }
-            else:
-                logger.error(f'{client.account.address} | Проблема с подключением кошелька')
-                return
-        async with session.post(url='https://faucet-api.saharaa.info/api/claim2', headers=headers_claim, json=json_claim) as response:
-            if response.status == 200:
-                logger.success(f'[{count}] {client.account.address} | Success Faucet')
-            elif response.status == 429:
-                error = await response.json()
-                logger.warning(f'[{count}] {client.account.address} | {error["msg"]}')
+    for attempt in range(0,3):
+        try:
+            async with aiohttp.ClientSession(connector=connector) as session:
+                async with session.post(url='https://testnet.saharalabs.ai/', headers=headers_test, json=json_test) as response:
+                    if response.status == 200:
+                        await captcha.captcha(proxy=proxy, session=session, user_agent=user_agent)
+                        headers_claim = {
+                            'cf-turnstile-response': await captcha.captcha(proxy=proxy, session=session, user_agent=user_agent),
+                            'user-agent': user_agent,
+                        }
+                        json_claim = {
+                            'address': client.account.address,
+                        }
+                    else:
+                        raise ConnectionError (f'{client.account.address} | Проблема с подключением кошелька')
+                async with session.post(url='https://faucet-api.saharaa.info/api/claim2', headers=headers_claim, json=json_claim) as response:
+                    if response.status == 200:
+                        logger.success(f'[{count}] {client.account.address} | Success Faucet')
+                        return
+                    elif response.status == 429:
+                        error = await response.json()
+                        logger.warning(f'[{count}] {client.account.address} | {error["msg"]}')
+                        return
+        except Exception:
+            logger.warning(f'[{count}] {client.account.address} | Retry faucet')
+    logger.error(f'[{count}] {client.account.address} | Faucet failed')
