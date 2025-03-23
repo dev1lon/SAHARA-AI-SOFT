@@ -71,6 +71,6 @@ async def claim(count, proxy, client):
                     else:
                         logger.error(f'[{count}] {client.account.address} | Ошибка во время клейма, пробую ещё раз')
             except Exception as err:
-                logger.warning(f'[{count}] {client.account.address} | Retry claim')
+                logger.warning(f'[{count}] {client.account.address} | {err} | Retry claim')
                 await asyncio.sleep(15)
-    logger.error(f'[{count}] {client.account.address} | {err} | Claim failed')
+    logger.error(f'[{count}] {client.account.address} | Claim failed')

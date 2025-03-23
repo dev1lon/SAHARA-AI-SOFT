@@ -57,6 +57,6 @@ async def balance_shards(count, proxy, client):
                     balance = data['shardAmount']
                     logger.success(f'[{count}] {client.account.address} | {balance} shards')
             except Exception as err:
-                logger.warning(f'[{count}] {client.account.address} | Retry check balance shards')
+                logger.warning(f'[{count}] {client.account.address} | {err} | Retry check balance shards')
                 await asyncio.sleep(15)
-    logger.error(f'[{count}] {client.account.address} | {err} | Check balance shards failed')
+    logger.error(f'[{count}] {client.account.address} | Check balance shards failed')
