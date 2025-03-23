@@ -59,6 +59,6 @@ async def faucet(count, proxy, client):
                         error = await response.json()
                         logger.warning(f'[{count}] {client.account.address} | {error["msg"]}')
                         return
-        except Exception:
-            logger.warning(f'[{count}] {client.account.address} | Retry faucet')
+        except Exception as err:
+            logger.warning(f'[{count}] {client.account.address} | {err} | Retry faucet')
     logger.error(f'[{count}] {client.account.address} | Faucet failed')

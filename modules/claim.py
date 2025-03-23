@@ -26,42 +26,49 @@ async def claim(count, proxy, client):
 
     connector = ProxyConnector.from_url(f'http://{proxy}')
 
-    async with aiohttp.ClientSession(connector=connector, headers=headers) as session:
-        async with session.post(url='https://legends.saharalabs.ai/api/v1/user/challenge', json=json_challenge) as response:
-            challenge = await response.json()
-            challenge_code = challenge['challenge']
-            sign_text = f'Sign in to Sahara!\nChallenge:{challenge_code}'
-            encoded_message = encode_defunct(text=sign_text)
-            signed_message = client.w3.eth.account.sign_message(encoded_message, client.private_key)
-            signature = signed_message.signature.hex()
+    for attempt in range(0,3):
+        try:
+            async with aiohttp.ClientSession(connector=connector, headers=headers) as session:
+                async with session.post(url='https://legends.saharalabs.ai/api/v1/user/challenge', json=json_challenge) as response:
+                    challenge = await response.json()
+                    challenge_code = challenge['challenge']
+                    sign_text = f'Sign in to Sahara!\nChallenge:{challenge_code}'
+                    encoded_message = encode_defunct(text=sign_text)
+                    signed_message = client.w3.eth.account.sign_message(encoded_message, client.private_key)
+                    signature = signed_message.signature.hex()
 
-            json_wallet = {
-                'address': client.account.address,
-                'sig': signature,
-                'timestamp': time.time(),
-            }
-        async with session.post(url='https://legends.saharalabs.ai/api/v1/login/wallet', json=json_wallet) as response:
-            data = await response.json()
-            access_token = data['accessToken']
-            headers_claim = {
-                'authorization': f'Bearer {access_token}'
-            }
-            json_claim = {
-                'taskID': '1004',
-                'timestamp': time.time(),
-            }
+                    json_wallet = {
+                        'address': client.account.address,
+                        'sig': signature,
+                        'timestamp': time.time(),
+                    }
+                async with session.post(url='https://legends.saharalabs.ai/api/v1/login/wallet', json=json_wallet) as response:
+                    data = await response.json()
+                    access_token = data['accessToken']
+                    headers_claim = {
+                        'authorization': f'Bearer {access_token}'
+                    }
+                    json_claim = {
+                        'taskID': '1004',
+                        'timestamp': time.time(),
+                    }
 
-        async with session.post(url='https://legends.saharalabs.ai/api/v1/task/flush',json=json_claim, headers=headers_claim):
-            await asyncio.sleep(5)
+                async with session.post(url='https://legends.saharalabs.ai/api/v1/task/flush',json=json_claim, headers=headers_claim):
+                    await asyncio.sleep(5)
 
-        async with session.post(url='https://legends.saharalabs.ai/api/v1/task/claim', json=json_claim, headers=headers_claim) as response:
-            status = await response.json()
-            if response.status == 400:
-                if status['message'] == 'reward of task: 1004 has been claimed':
-                    logger.warning(f'[{count}] {client.account.address} | Награда уже была заклеймлина сегодня')
-                elif status['message'] == 'task not finished':
-                    logger.error(f'[{count}] {client.account.address} | Транзакция для клейма не сделана')
-            elif response.status == 200:
-                logger.success(f'[{count}] {client.account.address} | Удачный клейм')
-            else:
-                logger.error(f'[{count}] {client.account.address} | Ошибка во время клейма')
+                async with session.post(url='https://legends.saharalabs.ai/api/v1/task/claim', json=json_claim, headers=headers_claim) as response:
+                    status = await response.json()
+                    if response.status == 400:
+                        if status['message'] == 'reward of task: 1004 has been claimed':
+                            logger.warning(f'[{count}] {client.account.address} | Награда уже была заклеймлина сегодня')
+                            return
+                        elif status['message'] == 'task not finished':
+                            logger.error(f'[{count}] {client.account.address} | Транзакция для клейма не сделана')
+                            return
+                    elif response.status == 200:
+                        logger.success(f'[{count}] {client.account.address} | Удачный клейм')
+                        return
+                    else:
+                        logger.error(f'[{count}] {client.account.address} | Ошибка во время клейма, пробую ещё раз')
+        except Exception as err:
+            logger.warning(f'[{count}] {client.account.address} | {err} | Retry claim')
