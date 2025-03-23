@@ -1,4 +1,5 @@
 import aiohttp
+import asyncio
 
 from aiohttp_proxy import ProxyConnector
 from fake_useragent import UserAgent
@@ -61,4 +62,5 @@ async def faucet(count, proxy, client):
                         return
             except Exception as err:
                 logger.warning(f'[{count}] {client.account.address} | {err} | Retry faucet')
+                await asyncio.sleep(15)
     logger.error(f'[{count}] {client.account.address} | Faucet failed')
