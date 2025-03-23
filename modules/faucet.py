@@ -36,9 +36,9 @@ async def faucet(count, proxy, client):
 
     idx += 1
 
-    for attempt in range(0,3):
-        try:
-            async with aiohttp.ClientSession(connector=connector) as session:
+    async with aiohttp.ClientSession(connector=connector) as session:
+        for attempt in range(0,3):
+            try:
                 async with session.post(url='https://testnet.saharalabs.ai/', headers=headers_test, json=json_test) as response:
                     if response.status == 200:
                         await captcha.captcha(proxy=proxy, session=session, user_agent=user_agent)
@@ -59,6 +59,6 @@ async def faucet(count, proxy, client):
                         error = await response.json()
                         logger.warning(f'[{count}] {client.account.address} | {error["msg"]}')
                         return
-        except Exception as err:
-            logger.warning(f'[{count}] {client.account.address} | {err} | Retry faucet')
+            except Exception as err:
+                logger.warning(f'[{count}] {client.account.address} | {err} | Retry faucet')
     logger.error(f'[{count}] {client.account.address} | Faucet failed')

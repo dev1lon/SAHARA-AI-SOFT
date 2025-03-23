@@ -26,9 +26,9 @@ async def claim(count, proxy, client):
 
     connector = ProxyConnector.from_url(f'http://{proxy}')
 
-    for attempt in range(0,3):
-        try:
-            async with aiohttp.ClientSession(connector=connector, headers=headers) as session:
+    async with aiohttp.ClientSession(connector=connector, headers=headers) as session:
+        for attempt in range(0,3):
+            try:
                 async with session.post(url='https://legends.saharalabs.ai/api/v1/user/challenge', json=json_challenge) as response:
                     challenge = await response.json()
                     challenge_code = challenge['challenge']
@@ -70,5 +70,5 @@ async def claim(count, proxy, client):
                         return
                     else:
                         logger.error(f'[{count}] {client.account.address} | Ошибка во время клейма, пробую ещё раз')
-        except Exception as err:
-            logger.warning(f'[{count}] {client.account.address} | {err} | Retry claim')
+            except Exception as err:
+                logger.warning(f'[{count}] {client.account.address} | {err} | Retry claim')
