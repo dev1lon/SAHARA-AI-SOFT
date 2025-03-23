@@ -53,6 +53,6 @@ async def process_wallets(count, private_key, proxy):
             logger.debug(f'[{count}] сон между действиями - {sleep_time} секунд')
             await asyncio.sleep(sleep_time)
 
-    sleep_time = random.randint(settings.sleep_wallets[0], settings.sleep_wallets[1])
-    logger.debug(f'Сон между кошельками - {sleep_time} секунд')
-    await asyncio.sleep(sleep_time)
+        sleep_time = random.randint(settings.sleep_wallets[0], settings.sleep_wallets[1])
+        logger.debug(f'Сон между кошельками - {sleep_time} секунд')
+        await asyncio.sleep(sleep_time)
